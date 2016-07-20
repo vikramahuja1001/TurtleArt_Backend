@@ -497,6 +497,7 @@ class BaseRepo(object):
         """Determine the identity to use for new commits.
         """
         config = self.get_config_stack()
+        print config.get((b"user", ), b"name") + b" <" 
         return (config.get((b"user", ), b"name") + b" <" +
                 config.get((b"user", ), b"email") + b">")
 

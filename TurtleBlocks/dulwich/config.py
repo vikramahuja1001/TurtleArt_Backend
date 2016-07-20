@@ -400,6 +400,7 @@ class StackedConfig(Config):
     def get(self, section, name):
         for backend in self.backends:
             try:
+                print backend.get(section,name)
                 return backend.get(section, name)
             except KeyError:
                 pass

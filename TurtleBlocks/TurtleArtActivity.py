@@ -794,9 +794,9 @@ class TurtleArtActivity(activity.Activity):
         self._add_button('view-polar', _('Polar coordinates'),
                          self.do_polar_cb, self._view_toolbar)
         self._add_button('view-polar', _('Git Init'),
-                         init, self._git_toolbar)
+                         self.create_git_repo, self._git_toolbar)
         self._add_button('view-polar', _('Save to file'),
-                         save, self._git_toolbar)
+                         self.save_to_repo, self._git_toolbar)
         self._add_button('view-polar', _('Git Add'),
                          add, self._git_toolbar)
         self._add_button('view-polar', _('Git Status'),
@@ -804,13 +804,13 @@ class TurtleArtActivity(activity.Activity):
         self._add_button('view-polar', _('Git Commit'),
                          commit, self._git_toolbar)
         self._add_button('view-polar', _('Commit History'),
-                         self.do_polar_cb, self._git_toolbar)
+                         commithistory, self._git_toolbar)
         self._add_button('view-polar', _('Revert back to a commit'),
-                         self.do_polar_cb, self._git_toolbar)
+                         self.get_data, self._git_toolbar)
         self._add_button('view-polar', _('Git Diff'),
                          self.do_polar_cb, self._git_toolbar)
         self._add_button('view-polar', _('Load a repo'),
-                         self.do_polar_cb, self._git_toolbar)
+                         self.load_from_repo, self._git_toolbar)
 
         if get_hardware() in [XO1, XO15, XO175, XO4]:
             self._add_button('view-metric', _('Metric coordinates'),
@@ -842,6 +842,95 @@ class TurtleArtActivity(activity.Activity):
         self.edit_toolbar_button.set_expanded(True)
         self.edit_toolbar_button.set_expanded(False)
         self.palette_toolbar_button.set_expanded(True)
+
+    def create_git_repo(self, button):
+        tmpfile = self._dump_ta_code()
+        f = file(tmpfile, 'r')
+        code = f.read()
+        f.close()
+        init(code)
+
+
+    def save_to_repo(self, button):
+        tmpfile = self._dump_ta_code()
+        f = file(tmpfile, 'r')
+        code = f.read()
+        f.close()
+        save(code)
+
+    def load_from_repo(self, button):
+        self.do_load_repo(button)
+
+
+    def do_load_repo(self, button):
+        ''' Open dialog for files'''
+        if hasattr(self, 'get_window'):
+            _logger.debug('setting watch cursor')
+            if hasattr(self.get_window(), 'get_cursor'):
+                self._old_cursor = self.get_window().get_cursor()
+            self.get_window().set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+        self._create_file_store()
+        # self.tw.load_file_from_chooser(True)
+        # Now that the file is loaded, restore the cursor
+        _logger.debug('restoring cursor')
+        self.restore_cursor()
+
+    def _create_file_store(self, widget=None):
+        if self._sample_window is None:
+            self._sample_box = gtk.EventBox()
+            self._sample_window = gtk.ScrolledWindow()
+            self._sample_window.set_policy(gtk.POLICY_NEVER,
+                                           gtk.POLICY_AUTOMATIC)
+            width = gtk.gdk.screen_width() / 2
+            height = gtk.gdk.screen_height() / 2
+            self._sample_window.set_size_request(width, height)
+            self._sample_window.show()
+
+            store = gtk.ListStore(gtk.gdk.Pixbuf, str)
+
+            icon_view = gtk.IconView()
+            icon_view.set_model(store)
+            icon_view.set_selection_mode(gtk.SELECTION_SINGLE)
+            icon_view.connect('selection-changed', self._sample_selected,
+                              store)
+            icon_view.set_pixbuf_column(0)
+            icon_view.grab_focus()
+            self._sample_window.add_with_viewport(icon_view)
+            icon_view.show()
+            self._fill_gitfiles_list(store)
+
+            width = gtk.gdk.screen_width() / 4
+            height = gtk.gdk.screen_height() / 4
+
+            self._sample_box.add(self._sample_window)
+            self.fixed.put(self._sample_box, width, height)
+
+        self._sample_window.show()
+        self._sample_box.show()
+
+    def _fill_gitfiles_list(self, store):
+        '''
+        Append images from the artwork_paths to the store.
+        '''
+        samples = self._scan_for_gitfiles()
+        for filepath in samples:
+            pixbuf = None
+            pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(
+                filepath, 100, 100)
+            store.append([pixbuf, filepath])
+
+    def _scan_for_gitfiles(self):
+        path = os.path.join(activity.get_bundle_path(), 'turtle')
+        print path
+        samples = []
+        for name in os.listdir(path):
+            if name.endswith(".ta"):
+                samples.append(os.path.join(path, name))
+        samples.sort()
+        print samples
+        return samples
+
+
 
     def _setup_extra_controls(self):
         ''' Add the rest of the buttons to the main toolbar '''

@@ -105,8 +105,9 @@ class backend():
 			print "Repo does not exist"
 
 
-	def commit(self, message):
-		p.commit(self.repo, message)
+	def commit(self, message,committer):
+		print type(committer)
+		p.commit(self.repo, message,committer = committer)
 
 
 	def get_commit_history(self, f):

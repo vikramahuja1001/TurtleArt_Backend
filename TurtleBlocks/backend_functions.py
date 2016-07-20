@@ -11,16 +11,29 @@ from backend import *
 
 b=backend()
 
-def init(button):
+def init(code):
 	print "Initializing the repo"
 	#b = backend()
-	b.local_init("turtle", "TurtleJS")
+
+	b.local_init("turtle", "TurtleArt")
+	thumbnail = os.getcwd() + '/thumbnail'
+	os.mkdir(thumbnail)
 	print b.repo_name
-	a = "turtle_vikram.tb"
-	b.set_current_file_name(a)
-	c = "[[0,[\"start\",{\"collapsed\":false,\"xcor\":0,\"ycor\":0,\"heading\":0,\"color\":0,\"shade\":50,\"pensize\":5,\"grey\":100}],250,150,[null,null,null]]]"
-	b.create_file(a,c)
-	b.set_current_file_name(a)
+	a = "turtle_vikram"
+	file_name = a+'.ta'
+	print file_name
+	b.set_current_file_name(file_name)
+	c = code 
+	b.create_file(file_name,c)
+	b.set_current_file_name(file_name)
+
+	import base64
+	imgdata = base64.b64decode(str(a))
+	file_name = thumbnail + '/' + a + '.png'
+	print file_name
+	#filename = 'some_image.jpg'  # I assume you have a way of picking unique filenames
+	image = open(file_name, "wb")
+	image.write(imgdata)
 	print "File Created"
 
 
@@ -42,10 +55,10 @@ def commit(button):
 	print "Commiting"
 	#b.load_repo("turtle")
 	a = "First Commit"
-	b.commit(a)
+	b.commit(a,"vikram")
 	print "commited"
 
-def commithistory():
+def commithistory(button):
 	#b.load_repo("turtle")
 	print b.current_file_name
 	a = b.get_commit_history(b.current_file_name)
@@ -55,9 +68,7 @@ def commithistory():
 	print c 
 	print type(a)
 	print len(a)
-	img = "<img src=\"{{ url_for('static', filename='header-icons/delete.svg') }}\"  onclick=\"hide()\"/>"
-	c = "<h2>" + c + "</h2>"
-	return img+c
+	print c
 
 
 def revertcommit():
@@ -197,14 +208,11 @@ def loadrepo():
 	a = "<h2>Repo loaded: " + b.repo_name + "</h2>"
 	return img+a
 
-def save(button):
-	a = request.form['data']
-	print a
-	print type(a)
-	a = str(a)
-	b.edit_file(b.current_file_name,a)
+def save(code):
+	print code
+	print type(code)
+	code = str(code)
+	b.edit_file(b.current_file_name,code)
 	print b.current_file_name
-	a = "<h2> File Saved: " + b.current_file_name + "</h2>" 
-	img = "<img src=\"{{ url_for('static', filename='header-icons/delete.svg') }}\"  onclick=\"hide()\"/>"
-	return img+a
+	print "Saved"
 
