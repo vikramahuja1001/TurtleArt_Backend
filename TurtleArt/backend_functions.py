@@ -30,7 +30,7 @@ def init(code):
 	print "File Created"
 
 
-def add(button):
+def add():
 	#b.load_repo("turtle")
 	print "Adding"
 	b.add(b.current_file_name)

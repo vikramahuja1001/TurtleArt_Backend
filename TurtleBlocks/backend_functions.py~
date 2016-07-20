@@ -1,4 +1,0 @@
-def ginit():
-	b.local_init("turtle", "TurtleJS")
-	print b.repo_name
-

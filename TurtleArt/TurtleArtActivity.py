@@ -798,7 +798,7 @@ class TurtleArtActivity(activity.Activity):
         self._add_button('view-polar', _('Save to file'),
                          self.save_to_repo, self._git_toolbar)
         self._add_button('view-polar', _('Git Add'),
-                         add, self._git_toolbar)
+                         self.git_add, self._git_toolbar)
         self._add_button('view-polar', _('Git Status'),
                          status, self._git_toolbar)
         self._add_button('view-polar', _('Git Commit'),
@@ -843,13 +843,36 @@ class TurtleArtActivity(activity.Activity):
         self.edit_toolbar_button.set_expanded(False)
         self.palette_toolbar_button.set_expanded(True)
 
+    def git_alert(self, text):
+        parent = None
+        md = gtk.MessageDialog(parent, 
+            gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, 
+            gtk.BUTTONS_CLOSE, text)
+        md.run()
+        md.destroy()
+
     def create_git_repo(self, button):
         tmpfile = self._dump_ta_code()
         f = file(tmpfile, 'r')
         code = f.read()
         f.close()
         init(code)
-
+        self.git_alert("Initialized")
+        '''
+        label = gtk.Label("Nice label")
+        dialog = gtk.Dialog("My dialog",
+                   None,
+                   gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+                   (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        dialog.vbox.pack_start(label)
+        label.show()
+        checkbox = gtk.CheckButton("Useless checkbox")
+        dialog.action_area.pack_end(checkbox)
+        checkbox.show()
+        response = dialog.run()
+        dialog.destroy()
+        '''
 
     def save_to_repo(self, button):
         tmpfile = self._dump_ta_code()
@@ -857,6 +880,11 @@ class TurtleArtActivity(activity.Activity):
         code = f.read()
         f.close()
         save(code)
+        self.git_alert("Saved")
+
+    def git_add(self, button):
+        add()
+        self.git_alert("Added")
 
     def load_from_repo(self, button):
         self.do_load_repo(button)
