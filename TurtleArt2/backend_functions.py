@@ -29,6 +29,20 @@ def init(code):
 
 	print "File Created"
 
+def init_file(code, name):
+	b.load_repo("turtle")
+	print "Creating new file"
+	print b.repo_name
+	#name = "turtle_vikram"
+	file_name = name +'.ta'
+	print file_name
+	b.set_current_file_name(file_name)
+	c = code 
+	b.create_file(file_name,c)
+	b.set_current_file_name(file_name)
+
+	print "File Created"
+
 
 def add():
 	#b.load_repo("turtle")
@@ -49,7 +63,7 @@ def commit(text):
 	print "Commiting"
 	#b.load_repo("turtle")
 	a = text
-	b.commit(a,"vikram")
+	b.commit(a,"vikramahuja1001")
 	print "commited"
 
 def commithistory(button):
@@ -206,4 +220,16 @@ def save(code):
 	b.edit_file(b.current_file_name,code)
 	print b.current_file_name
 	print "Saved"
+
+def clone():
+	b.clone_remote('turtle')
+	b.load_repo("turtle")
+
+def pull():
+	b.load_repo("turtle")
+	b.update_local()
+
+def push():
+	b.push()
+
 

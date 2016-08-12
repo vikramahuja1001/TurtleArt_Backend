@@ -793,8 +793,10 @@ class TurtleArtActivity(activity.Activity):
                          self.do_cartesian_cb, self._view_toolbar)
         self._add_button('view-polar', _('Polar coordinates'),
                          self.do_polar_cb, self._view_toolbar)
-        self._add_button('view-polar', _('Git Init'),
-                         self.create_git_repo, self._git_toolbar)
+        #self._add_button('view-polar', _('Git Init'),
+        #                 self.create_git_repo, self._git_toolbar)
+        self._add_button('view-polar', _('Create new file'),
+                         self.create_file, self._git_toolbar)
         self._add_button('view-polar', _('Save to file'),
                          self.save_to_repo, self._git_toolbar)
         self._add_button('view-polar', _('Git Add'),
@@ -809,8 +811,15 @@ class TurtleArtActivity(activity.Activity):
                          self.revert_to_commit, self._git_toolbar)
         self._add_button('view-polar', _('Git Diff'),
                          self.do_polar_cb, self._git_toolbar)
-        self._add_button('view-polar', _('Load a repo'),
+        self._add_button('view-polar', _('Load a file from local repo'),
                          self.load_from_repo, self._git_toolbar)
+        self._add_button('view-polar', _('Git Clone'),
+                         self.git_clone, self._git_toolbar)
+        self._add_button('view-polar', _('Git Pull'),
+                         self.git_pull, self._git_toolbar)
+        self._add_button('view-polar', _('Git Push'),
+                         self.git_push, self._git_toolbar)
+    
 
         if get_hardware() in [XO1, XO15, XO175, XO4]:
             self._add_button('view-metric', _('Metric coordinates'),
@@ -843,6 +852,15 @@ class TurtleArtActivity(activity.Activity):
         self.edit_toolbar_button.set_expanded(False)
         self.palette_toolbar_button.set_expanded(True)
 
+    def git_clone(self, button):
+        clone()
+
+    def git_push(self, button):
+        push()
+
+    def git_pull(self, button):
+        pull()
+
     def git_alert(self, text):
         parent = None
         md = gtk.MessageDialog(parent, 
@@ -858,6 +876,39 @@ class TurtleArtActivity(activity.Activity):
         f.close()
         init(code)
         self.git_alert("Initialized")
+
+    def create_file(self, button):
+        tmpfile = self._dump_ta_code()
+        f = file(tmpfile, 'r')
+        code = f.read()
+        f.close()
+
+        dialog = gtk.MessageDialog(
+            None,
+            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+            gtk.MESSAGE_QUESTION,
+            gtk.BUTTONS_OK,
+            None)
+        dialog.set_markup('Please enter file name')
+        #create the text input field
+        entry = gtk.Entry()
+        #allow the user to press enter to do ok
+        entry.connect("activate", self.responseToDialog, dialog, gtk.RESPONSE_OK)
+        #create a horizontal box to pack the entry and a label
+        hbox = gtk.HBox()
+        hbox.pack_start(gtk.Label("Name:"), False, 5, 5)
+        hbox.pack_end(entry)
+        #some secondary text
+        #add it and show it
+        dialog.vbox.pack_end(hbox, True, True, 0)
+        dialog.show_all()
+        #go go go
+        dialog.run()
+        text = entry.get_text()
+        dialog.destroy()
+        print text
+        init_file(code, text)
+        self.git_alert("File Created")
 
 
     def save_to_repo(self, button):

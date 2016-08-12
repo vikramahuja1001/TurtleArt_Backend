@@ -571,10 +571,13 @@ def push(repo, remote_location, refspecs=None,
     """
 
     # Open the repo
+    print "Before"
     with open_repo_closing(repo) as r:
-
+        print "After"
         # Get the client and path
         client, path = get_transport_and_path(remote_location)
+        print client
+        print path
 
         selected_refs = []
 
@@ -860,3 +863,8 @@ def pack_objects(repo, object_ids, packf, idxf, delta_window_size=None):
         entries = [(k, v[0], v[1]) for (k, v) in entries.items()]
         entries.sort()
         write_pack_index(idxf, entries, data_sum)
+
+
+
+
+

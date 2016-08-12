@@ -43,7 +43,7 @@ class backend():
 		self.repo_path = ""
 		self.repo_name = ""
 		self.isaclone = 0
-		self.cloned_from = ""
+		self.cloned_from = "git://github.com/vikramahuja1001/TurtleCodes.git"
 		self.current_file_name = ""
 
 
@@ -147,9 +147,10 @@ class backend():
 		p.clone(self.repo_path,clone_repo_name)
 
 
-	def clone_remote(remote_repo_name, clone_repo_name):
+	def clone_remote(self, clone_repo_name):
+		self.isaclone = 1
 		#Creating a clone of remote repo.
-		p.clone(remote_repo_name, clone_repo_name)
+		p.clone(self.cloned_from, clone_repo_name)
 
 
 	def commit_logs(self):
@@ -208,11 +209,19 @@ class backend():
 
 
 	def update_local(self):
-		if self.isaclone == 1:
+		if self.isaclone == 1 or self.isaclone == 0:
 			try:
-				p.pull(self.repo, self.cloned_from)
-			except:
-				print "Error"
+				p.pull(self.repo_path, self.cloned_from)
+			except Exception as e:
+				print e
 
 		else:
 			print "Can not update"
+
+	def push(self):
+		try:
+			p.push( self.cloned_from , self.repo.path)
+		except Exception as e:
+			print e
+			print "Error"
+
